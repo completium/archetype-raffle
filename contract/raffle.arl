@@ -1,4 +1,4 @@
-archetype multi_raffle(owner: address)
+archetype raffle(owner: address)
 
 variable jackpot         : tez            = 0tz
 variable raffle_key_hash : option<bytes>  = none
