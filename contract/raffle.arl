@@ -1,0 +1,58 @@
+archetype multi_raffle(owner: address)
+
+variable jackpot         : tez            = 0tz
+variable raffle_key_hash : option<bytes>  = none
+variable close_date      : option<date>   = none
+variable desc            : option<string> = none
+
+constant ticket_price : tez = 1tz
+
+asset player {
+  id : address
+}
+
+states =
+| Created initial
+| Running
+| Transferred
+
+transition open(prize : tez, cd : date, d : string, w : bytes) {
+  called by owner
+  require {
+    r0 : now + 7d < cd         otherwise "INVALID_CLOSE_DATE";
+    r1 : transferred = jackpot otherwise "INVALID_AMOUNT"
+  }
+  from Created to Running
+  with effect {
+    raffle_key_hash  := some(w);
+    close_date       := some(cd);
+    desc             := some(d);
+  }
+}
+
+entry buy () {
+  state is Running
+  require {
+    r2 : transferred = ticket_price otherwise "INVALID_TICKET_PRICE";
+    r3 : now < opt_get(close_date)  otherwise "RAFFLE_CLOSED"
+  }
+  effect { player.add({ caller }) }
+}
+
+function is_raffle_key(rkey : nat, salt : nat) : bool {
+  return (some(keccak(pack((rkey, salt)))) = raffle_key_hash)
+}
+
+transition transfer_jackpot(raffle_key : nat, salt : nat) {
+  require {
+    r4 : now > opt_get(close_date)       otherwise "RAFFLE_OPENED";
+    r5 : is_raffle_key(raffle_key, salt) otherwise "INVALID_WINNER_ID"
+  }
+  from Running to Transferred
+  with effect {
+    transfer jackpot to player.nth(raffle_key % player.count());
+    transfer (balance - jackpot) to owner;
+    player.clear()
+  }
+}
+
