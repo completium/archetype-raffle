@@ -51,7 +51,7 @@ function unlock_raffle_key(k : chest_key) : unlock_result {
       | some(raffle_key) -> Success(raffle_key)
       | none -> Fail("INVALID_RAFFLE_KEY_TYPE")
       end
-    | right(v) -> Fail("INVALID_TIMELOCK")
+    | right(v) -> if v then Fail("INVALID_TIMELOCK") else Fail("INVALID_CHEST_KEY")
     end)
 }
 
