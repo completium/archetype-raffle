@@ -1,8 +1,8 @@
 archetype raffle(owner: address, min_duration : duration, jackpot : tez)
 
-variable raffle_key_hash : option<bytes>  = none
-variable close_date      : option<date>   = none
-variable desc            : option<string> = none
+variable locked_raffle_key : option<chest>  = none
+variable close_date        : option<date>   = none
+variable desc              : option<string> = none
 
 constant ticket_price : tez = 1tz
 
@@ -15,7 +15,7 @@ states =
 | Running
 | Transferred
 
-transition open(cd : date, d : string, w : bytes) {
+transition open(cd : date, d : string, lrk : chest) {
   called by owner
   require {
     r0 : now + min_duration < cd   otherwise "INVALID_CLOSE_DATE";
@@ -23,9 +23,9 @@ transition open(cd : date, d : string, w : bytes) {
   }
   from Created to Running
   with effect {
-    raffle_key_hash  := some(w);
-    close_date       := some(cd);
-    desc             := some(d);
+    locked_raffle_key := some(lrk);
+    close_date        := some(cd);
+    desc              := some(d);
   }
 }
 
@@ -38,20 +38,37 @@ entry buy () {
   effect { player.add({ caller }) }
 }
 
-function is_raffle_key(rkey : nat, salt : nat) : bool {
-  return (some(keccak(pack((rkey, salt)))) = raffle_key_hash)
+enum unlock_result =
+| Success<nat>
+| Fail<string>
+
+function unlock_raffle_key(k : chest_key) : unlock_result {
+  var time : int = min_duration;
+  return (
+    match open_chest(k, opt_get(locked_raffle_key), abs(time)) with
+    | left(unlocked) ->
+      match unpack<nat>(unlocked) with
+      | some(raffle_key) -> Success(raffle_key)
+      | none -> Fail("INVALID_RAFFLE_KEY_TYPE")
+      end
+    | right(v) -> Fail("INVALID_TIMELOCK")
+    end)
 }
 
-transition transfer_jackpot(raffle_key : nat, salt : nat) {
+transition transfer_jackpot(k : chest_key) {
   require {
-    r4 : now > opt_get(close_date)       otherwise "RAFFLE_OPENED";
-    r5 : is_raffle_key(raffle_key, salt) otherwise "INVALID_WINNER_ID"
+    r4 : now > opt_get(close_date) otherwise "RAFFLE_OPENED";
   }
   from Running to Transferred
   with effect {
-    transfer jackpot to player.nth(raffle_key % player.count());
-    transfer (balance - jackpot) to owner;
-    player.clear()
+    match unlock_raffle_key(k) with
+    | Success(raffle_key) -> begin
+        transfer jackpot to player.nth(raffle_key % player.count());
+        transfer (balance - jackpot) to owner;
+        player.clear()
+      end
+    | Fail(error) -> fail(error)
+    end
   }
 }
 
