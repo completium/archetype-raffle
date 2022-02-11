@@ -1,6 +1,5 @@
-archetype raffle(owner: address)
+archetype raffle(owner: address, min_duration : duration, jackpot : tez)
 
-variable jackpot         : tez            = 0tz
 variable raffle_key_hash : option<bytes>  = none
 variable close_date      : option<date>   = none
 variable desc            : option<string> = none
@@ -16,11 +15,11 @@ states =
 | Running
 | Transferred
 
-transition open(prize : tez, cd : date, d : string, w : bytes) {
+transition open(cd : date, d : string, w : bytes) {
   called by owner
   require {
-    r0 : now + 7d < cd         otherwise "INVALID_CLOSE_DATE";
-    r1 : transferred = jackpot otherwise "INVALID_AMOUNT"
+    r0 : now + min_duration < cd   otherwise "INVALID_CLOSE_DATE";
+    r1 : transferred = jackpot     otherwise "INVALID_AMOUNT"
   }
   from Created to Running
   with effect {
