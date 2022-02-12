@@ -38,7 +38,7 @@ const errors = {
   PLAYER_ALREADY_EXISTS : '(Pair "KeyExists" "player")',
   RAFFLE_CLOSED         : '"RAFFLE_CLOSED"',
   RAFFLE_OPEN           : '"RAFFLE_OPEN"',
-  INVALID_TIMELOCK     : '"INVALID_TIMELOCK"',
+  INVALID_TIMELOCK      : '"INVALID_TIMELOCK"',
   INVALID_STATE         : '"InvalidState"'
 }
 
