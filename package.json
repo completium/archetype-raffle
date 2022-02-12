@@ -27,7 +27,7 @@
   },
   "homepage": "https://gitlab.com/completium/archetype-raffle#readme",
   "dependencies": {
-    "@completium/completium-cli": "^0.3.22",
+    "@completium/completium-cli": "^0.3.23",
     "mocha": "^9.2.0"
   }
 }

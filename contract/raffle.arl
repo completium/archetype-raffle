@@ -1,10 +1,8 @@
-archetype raffle(owner: address, min_duration : duration, jackpot : tez)
+archetype raffle(owner: address, min_duration : duration, jackpot : tez, ticket_price : tez)
 
 variable locked_raffle_key : option<chest>  = none
 variable close_date        : option<date>   = none
 variable desc              : option<string> = none
-
-constant ticket_price : tez = 1tz
 
 asset player {
   id : address
@@ -57,7 +55,7 @@ function unlock_raffle_key(k : chest_key) : unlock_result {
 
 transition transfer_jackpot(k : chest_key) {
   require {
-    r4 : now > opt_get(close_date) otherwise "RAFFLE_OPENED";
+    r4 : now > opt_get(close_date) otherwise "RAFFLE_OPEN";
   }
   from Running to Transferred
   with effect {
