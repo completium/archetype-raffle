@@ -36,35 +36,20 @@ entry buy () {
   effect { player.add({ caller }) }
 }
 
-enum unlock_result =
-| Success<nat>
-| Fail<string>
-
-function unlock_raffle_key(k : chest_key, time : nat) : unlock_result {
-  return (
-    match open_chest(k, opt_get(locked_raffle_key), time) with
-    | left(unlocked) ->
-      match unpack<nat>(unlocked) with
-      | some(raffle_key) -> Success(raffle_key)
-      | none -> Fail("INVALID_RAFFLE_KEY_TYPE")
-      end
-    | right(v) -> if v then Fail("INVALID_TIMELOCK") else Fail("INVALID_CHEST_KEY")
-    end)
-}
-
 transition transfer_jackpot(k : chest_key, time : nat) {
   require {
     r4 : now > opt_get(close_date) otherwise "RAFFLE_OPEN";
   }
   from Running to Transferred
   with effect {
-    match unlock_raffle_key(k, time) with
-    | Success(raffle_key) -> begin
+    match open_chest(k, opt_get(locked_raffle_key), time) with
+    | left(unlocked) -> begin
+        var raffle_key = opt_get(unpack<nat>(unlocked));
         transfer jackpot to player.nth(raffle_key % player.count());
         transfer (balance - jackpot) to owner;
         player.clear()
       end
-    | Fail(error) -> fail(error)
+    | right(error) -> fail("INVALID_TIMELOCK")
     end
   }
 }
