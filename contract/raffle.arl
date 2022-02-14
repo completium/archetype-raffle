@@ -1,12 +1,17 @@
-archetype raffle(owner: address, min_duration : duration, jackpot : tez, ticket_price : tez, reveal_fee : rational)
+archetype raffle(
+  owner        : address,
+  min_duration : duration,
+  jackpot      : tez,
+  ticket_price : tez,
+  reveal_fee   : rational)
 
 variable close_date        : option<date>   = none
 variable desc              : option<string> = none
 
 asset player {
-  id : address;
+  id                : address;
   locked_raffle_key : chest;
-  raffle_key : option<nat> = none
+  raffle_key        : option<nat> = none
 }
 
 states =
@@ -14,7 +19,7 @@ states =
 | Running
 | Transferred
 
-transition open(cd : date, d : string, lrk : chest) {
+transition open(cd : date, d : string) {
   called by owner
   require {
     r0 : now + min_duration < cd   otherwise "INVALID_CLOSE_DATE";
