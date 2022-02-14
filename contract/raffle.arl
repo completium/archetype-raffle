@@ -66,9 +66,9 @@ entry reveal(addr : address, k : chest_key, time : nat) {
     end;
     nb_revealed += 1;
     player[addr].revealed := true;
-    transfer (reveal_fee * ticket_price) to caller;
     if nb_revealed = player.count() then
-      transfer 0tz to entry self.transfer_jackpot()
+      transfer 0tz to entry self.transfer_jackpot();
+    transfer (reveal_fee * ticket_price) to caller;
   }
 }
 
