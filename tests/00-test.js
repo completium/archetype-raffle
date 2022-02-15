@@ -135,7 +135,8 @@ describe("Test 'buy' entrypoint (at this point a raffle is open)", async () => {
     await expectToThrow(async () => {
       await raffle.buy({
         arg : {
-          lrk : LOCKED_RAFFLE_KEY_1
+          lrk : LOCKED_RAFFLE_KEY_1,
+          t   : TIME_1
         },
         as : alice.pkh
       })
@@ -146,7 +147,8 @@ describe("Test 'buy' entrypoint (at this point a raffle is open)", async () => {
     await expectToThrow(async () => {
       await raffle.buy({
         arg : {
-          lrk : LOCKED_RAFFLE_KEY_1
+          lrk : LOCKED_RAFFLE_KEY_1,
+          t   : TIME_1
         },
         as : alice.pkh,
         amount : TICKET_PRICE
@@ -157,7 +159,8 @@ describe("Test 'buy' entrypoint (at this point a raffle is open)", async () => {
   it("Alice successfully calls 'buy' entrypoint.", async () => {
     await raffle.buy({
       arg : {
-        lrk : LOCKED_RAFFLE_KEY_1
+        lrk : LOCKED_RAFFLE_KEY_1,
+        t   : TIME_1
       },
       as : alice.pkh,
       amount : TICKET_PRICE
@@ -167,7 +170,8 @@ describe("Test 'buy' entrypoint (at this point a raffle is open)", async () => {
     await expectToThrow(async () => {
       await raffle.buy({
         arg : {
-          lrk : LOCKED_RAFFLE_KEY_1
+          lrk : LOCKED_RAFFLE_KEY_1,
+          t   : TIME_1
         },
         as : alice.pkh,
         amount : TICKET_PRICE
@@ -177,7 +181,8 @@ describe("Test 'buy' entrypoint (at this point a raffle is open)", async () => {
   it("Jack successfully calls 'buy' entrypoint.", async () => {
     await raffle.buy({
       arg : {
-        lrk : LOCKED_RAFFLE_KEY_2
+        lrk : LOCKED_RAFFLE_KEY_2,
+        t   : TIME_2
       },
       as : jack.pkh,
       amount : TICKET_PRICE
@@ -190,8 +195,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
       await raffle.reveal({
         arg : {
           addr : alice.pkh,
-          k    : CHEST_KEY_1,
-          time : TIME_1
+          k    : CHEST_KEY_1
         },
         as : alice.pkh
       })
@@ -203,8 +207,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
       await raffle.reveal({
         arg : {
           addr : alice.pkh,
-          k    : INVALID_CHEST_KEY_1,
-          time : TIME_1
+          k    : INVALID_CHEST_KEY_1
         },
         as : alice.pkh
       })
@@ -217,8 +220,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
       await raffle.reveal({
             arg : {
               addr : alice.pkh,
-              k    : CHEST_KEY_1,
-              time : TIME_1
+              k    : CHEST_KEY_1
             },
             as : alice.pkh
           })
@@ -229,8 +231,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
       await raffle.reveal({
         arg : {
           addr : alice.pkh,
-          k    : CHEST_KEY_1,
-          time : TIME_1
+          k    : CHEST_KEY_1
         },
         as : alice.pkh
       })
@@ -243,8 +244,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
       await raffle.reveal({
             arg : {
               addr : jack.pkh,
-              k    : CHEST_KEY_2,
-              time : TIME_2
+              k    : CHEST_KEY_2
             },
             as : owner.pkh
           })
