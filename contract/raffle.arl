@@ -3,15 +3,15 @@ archetype raffle(
   min_duration : duration,
   jackpot      : tez,
   ticket_price : tez,
-  reveal_fee   : rational)
+  reveal_fee   : rational,
+)
 
-variable close_date : option<date>   = none
-variable desc       : option<string> = none
+variable close_date : option<date> = none
+variable chest_time : option<nat>  = none
 
 asset player {
   id                 : address;
   locked_raffle_key  : chest;
-  chest_time         : nat;
   revealed           : bool = false;
 }
 
@@ -23,7 +23,7 @@ states =
 | Running
 | Transferred
 
-transition open(cd : date, d : string) {
+transition open(cd : date, t : nat) {
   called by owner
   require {
     r0 : now + min_duration < cd   otherwise "INVALID_CLOSE_DATE";
@@ -32,17 +32,17 @@ transition open(cd : date, d : string) {
   from Created to Running
   with effect {
     close_date        := some(cd);
-    desc              := some(d);
+    chest_time        := some(t);
   }
 }
 
-entry buy (lrk : chest, t : nat) {
+entry buy (lrk : chest) {
   state is Running
   require {
     r2 : transferred = ticket_price otherwise "INVALID_TICKET_PRICE";
     r3 : now < opt_get(close_date)  otherwise "RAFFLE_CLOSED"
   }
-  effect { player.add({ id = caller; locked_raffle_key = lrk; chest_time = t }) }
+  effect { player.add({ id = caller; locked_raffle_key = lrk }) }
 }
 
 transition transfer_jackpot() {
@@ -61,7 +61,7 @@ entry reveal(addr : address, k : chest_key) {
     r5 : not player[addr].revealed otherwise "PLAYER_ALREADY_REVEALED"
   }
   effect {
-    match open_chest(k, player[addr].locked_raffle_key, player[addr].chest_time) with
+    match open_chest(k, player[addr].locked_raffle_key, opt_get(chest_time)) with
     | left (unlocked) -> raffle_key += opt_get(unpack<nat>(unlocked))
     | right(error)    -> fail("INVALID_TIMELOCK")
     end;
