@@ -67,7 +67,7 @@ $ npm test
     ✔ Alice unsuccessfully calls 'reveal' entrypoint because it is before the 'close_date'.
     ✔ Alice unsuccessfully calls 'reveal' entrypoint because of an invalid chest key.
     ✔ Alice successfully calls 'reveal' entrypoint and gets the reveal fee.
-    ✔ Alice unsuccessfully calls 'reveal' entrypoint because jackpot is already transferred.
+    ✔ Alice unsuccessfully calls 'reveal' entrypoint because her raffle key is already revealed.
     ✔ Owner successfully calls 'reveal' entrypoint to reveal Jack's raffle key; jackpot is transferred.
 
 

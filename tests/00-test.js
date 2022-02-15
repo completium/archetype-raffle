@@ -226,7 +226,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
           })
     }) }) })
   });
-  it("Alice unsuccessfully calls 'reveal' entrypoint because jackpot is already transferred.", async () => {
+  it("Alice unsuccessfully calls 'reveal' entrypoint because her raffle key is already revealed.", async () => {
     await expectToThrow(async () => {
       await raffle.reveal({
         arg : {
