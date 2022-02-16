@@ -52,6 +52,7 @@ $ npm test
   Open Raffle
     ✔ The unauthorized user Alice unsuccessfully calls 'open' entrypoint.
     ✔ Admin unsuccessfully calls 'open' entrypoint with wrong 'close_date'.
+    ✔ Admin unsuccessfully calls 'open' entrypoint with wrong 'reveal_fee'.
     ✔ Admin unsuccessfully calls 'open' entrypoint by sending not enough tez to the contract.
     ✔ Admin successfully calls 'open' entrypoint.
     ✔ Admin unsuccessfully calls 'open' entrypoint because a raffle is already open.
@@ -71,5 +72,5 @@ $ npm test
     ✔ Owner successfully calls 'reveal' entrypoint to reveal Jack's raffle key; jackpot is transferred.
 
 
-  16 passing (34s)
+  17 passing (36s)
 ```
