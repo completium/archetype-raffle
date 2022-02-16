@@ -24,6 +24,8 @@ let raffle;
 const JACKPOT           = "50tz"
 const TICKET_PRICE      = "5tz"
 const MIN_DURATION      = 60 * 60       // 1 hour
+
+// Open argument
 const REVEAL_FEE        = [ '2', '10' ] // 20% (archetype rational type is 'pair int nat')
 const CHEST_TIME        = 10000000
 
@@ -64,8 +66,7 @@ describe("Deploy", async () => {
         owner        : owner.pkh,
         min_duration : MIN_DURATION,
         jackpot      : JACKPOT,
-        ticket_price : TICKET_PRICE,
-        reveal_fee   : REVEAL_FEE
+        ticket_price : TICKET_PRICE
       },
       as: owner.pkh
     });
@@ -78,7 +79,8 @@ describe("Open Raffle", async () => {
       await raffle.open({
         arg : {
           cd : now,
-          t  : CHEST_TIME
+          t  : CHEST_TIME,
+          rf : REVEAL_FEE
         },
         as : alice.pkh
       })
@@ -89,7 +91,8 @@ describe("Open Raffle", async () => {
       await raffle.open({
         arg : {
           cd : [now + MIN_DURATION - 10],
-          t  : CHEST_TIME
+          t  : CHEST_TIME,
+          rf : REVEAL_FEE
         },
         as : owner.pkh
       })
@@ -100,7 +103,8 @@ describe("Open Raffle", async () => {
       await raffle.open({
         arg : {
           cd : [now + MIN_DURATION + 10],
-          t  : CHEST_TIME
+          t  : CHEST_TIME,
+          rf : REVEAL_FEE
         },
         as : owner.pkh
       })
@@ -110,7 +114,8 @@ describe("Open Raffle", async () => {
     await raffle.open({
       arg : {
         cd : [now + MIN_DURATION + 10],
-        t  : CHEST_TIME
+        t  : CHEST_TIME,
+        rf : REVEAL_FEE
       },
       as : owner.pkh,
       amount : JACKPOT
@@ -121,7 +126,8 @@ describe("Open Raffle", async () => {
       await raffle.open({
         arg : {
           cd : [now + MIN_DURATION + 10],
-          t  : CHEST_TIME
+          t  : CHEST_TIME,
+          rf : REVEAL_FEE
         },
         as : owner.pkh,
         amount : JACKPOT
