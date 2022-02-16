@@ -20,14 +20,15 @@ setMockupNow(now)
 // Contract
 let raffle;
 
-// Constants
+// Contract parameters
 const JACKPOT           = "50tz"
 const TICKET_PRICE      = "5tz"
 const MIN_DURATION      = 60 * 60       // 1 hour
 
 // Open argument
-const REVEAL_FEE        = [ '2', '10' ] // 20% (archetype rational type is 'pair int nat')
+const CLOSE_DATE        = [now + MIN_DURATION + 10]  // minimum duration plus 10 seconds
 const CHEST_TIME        = 10000000
+const REVEAL_FEE        = [ '2', '10' ]              // 20% (archetype rational type is 'pair int nat')
 
 // Partial raffle key one 123456
 const LOCKED_RAFFLE_KEY_1 = "0x858b9aafb7d89ca6b9d9f2b683bfd1abd1dabddbc6cbafa48bbdd0ae9afec4e9a6f8ae81e985f8cbd49486ee88ccedc0f5cbcda9b1bfd5f6b8cef0938affb9ce93b186d7f6e7e0c8d3c5e0febeabaead97c4f6caace3dcf8fdee9ba0ba83d88e81a8dbeec5b5f3f7e58dd4c5e1af96a0e7b196a4c2b08980f0b5f0ebf7eca8a19eacdbeaf5faacdba5a6c4d8f995dfebc1c6bae4e9a1fd87b48bdcdafbf7f6b0b19fd9f8c6ec90fba48aa3dde0f0cbe4ccea88ca94c5ccb28f96b89ef0edbcac909afac28ce3def295f1d0d8eddef8df9fe7e7d1dea9a580e1e2cbed92ce8c8cdc8f91a394f68a86e6a0aceb97f8e6f28c90ae8cf3a6b3f3eba58ff4c6e3c2e0b4d1d38b94b5d98cdbda8081c0fa9bcceceaaea7faa897d7cbb694b38bdfb6e1f2c296f603d1ced3abebe5db8ea3e68defdd9ae9cbc6d4f0f3dafae1c78cffdcd6c4fde4ce83d8b2e3ac928bbaa6dc8cc6f8ddf5b8ed95bcb0d8fa9de9c39afd9aa6b08189ebd48addde8fbad6ceffe5e684ad9bede8c9bdbd9e98a3c1e49ed481c3cfad9cc880a795838ed8b8b1bdf6d4fee793e5bbf98c85e4cf89e990f8d5aae9c3e5fcd782bde2f2fe82b0d09ddfc2d8fd92da9af788ee85958286d8aecc91dac28fa9dcb1ca9addcd86e8e989d2e1b7b6fbe0c7afbe97d182ebade5fc9fd2f2baf19a898590f3c0c380f0d5c6aefdc48cefa9cebfd6aad1a083b8cafaa2ffbaa4cb8de2a9acebcbd5ca9ebae0de86e8b6bcc0e8a78f80d28fc397f3abffcd9a8ff3b2ee96d8cbe5dbd39582d6f3aa8ca4c6f1c3d69df3c1b8e0928edbf7c6e6dbe09bbee6df9806ab3f7ef06f7ac1868a1cfa8db0f7a7cd565a7464e5290dff00000015d8c58609c521ed06a5268079693dd0428a9824d377"
@@ -49,7 +50,8 @@ const errors = {
   RAFFLE_OPEN             : '"RAFFLE_OPEN"',
   INVALID_TIMELOCK        : '"INVALID_TIMELOCK"',
   INVALID_STATE           : '"InvalidState"',
-  PLAYER_ALREADY_REVEALED : '"PLAYER_ALREADY_REVEALED"'
+  PLAYER_ALREADY_REVEALED : '"PLAYER_ALREADY_REVEALED"',
+  IVALID_REVEAL_FEE       : '"INVALID_REVEAL_FEE"'
 }
 
 const closeTo = (value, target, epsilon) => { return Math.abs(value - target) < epsilon }
@@ -102,7 +104,7 @@ describe("Open Raffle", async () => {
     await expectToThrow(async () => {
       await raffle.open({
         arg : {
-          cd : [now + MIN_DURATION + 10],
+          cd : CLOSE_DATE,
           t  : CHEST_TIME,
           rf : REVEAL_FEE
         },
@@ -113,7 +115,7 @@ describe("Open Raffle", async () => {
   it("Admin successfully calls 'open' entrypoint.", async () => {
     await raffle.open({
       arg : {
-        cd : [now + MIN_DURATION + 10],
+        cd : CLOSE_DATE,
         t  : CHEST_TIME,
         rf : REVEAL_FEE
       },
@@ -125,7 +127,7 @@ describe("Open Raffle", async () => {
     await expectToThrow(async () => {
       await raffle.open({
         arg : {
-          cd : [now + MIN_DURATION + 10],
+          cd : CLOSE_DATE,
           t  : CHEST_TIME,
           rf : REVEAL_FEE
         },
