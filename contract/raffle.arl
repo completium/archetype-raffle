@@ -28,7 +28,7 @@ transition open(cd : date, t : nat, rf : rational) {
   called by owner
   require {
     r0 : now + min_duration < cd   otherwise "INVALID_CLOSE_DATE";
-    r1 : rf < 1                    otherwise "INVALID_REVEAL_FEE";
+    r1 : rf <= 1                   otherwise "INVALID_REVEAL_FEE";
     r2 : transferred = jackpot     otherwise "INVALID_AMOUNT"
   }
   from Created to Running
