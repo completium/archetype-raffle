@@ -51,7 +51,7 @@ const errors = {
   INVALID_TIMELOCK        : '"INVALID_TIMELOCK"',
   INVALID_STATE           : '"InvalidState"',
   PLAYER_ALREADY_REVEALED : '"PLAYER_ALREADY_REVEALED"',
-  IVALID_REVEAL_FEE       : '"INVALID_REVEAL_FEE"'
+  INVALID_REVEAL_FEE      : '"INVALID_REVEAL_FEE"'
 }
 
 const closeTo = (value, target, epsilon) => { return Math.abs(value - target) < epsilon }
@@ -99,6 +99,18 @@ describe("Open Raffle", async () => {
         as : owner.pkh
       })
     }, errors.INVALID_CLOSE_DATE)
+  });
+  it("Admin unsuccessfully calls 'open' entrypoint with wrong 'reveal_fee'.", async () => {
+    await expectToThrow(async () => {
+      await raffle.open({
+        arg : {
+          cd : CLOSE_DATE,
+          t  : CHEST_TIME,
+          rf : [ '20', '10' ]
+        },
+        as : owner.pkh
+      })
+    }, errors.INVALID_REVEAL_FEE)
   });
   it("Admin unsuccessfully calls 'open' entrypoint by sending not enough tez to the contract.", async () => {
     await expectToThrow(async () => {
