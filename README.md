@@ -50,12 +50,12 @@ $ npm test
     ✔ Raffle
 
   Open Raffle
-    ✔ The unauthorized user Alice unsuccessfully calls 'open' entrypoint.
-    ✔ Admin unsuccessfully calls 'open' entrypoint with wrong 'close_date'.
-    ✔ Admin unsuccessfully calls 'open' entrypoint with wrong 'reveal_fee'.
-    ✔ Admin unsuccessfully calls 'open' entrypoint by sending not enough tez to the contract.
-    ✔ Admin successfully calls 'open' entrypoint.
-    ✔ Admin unsuccessfully calls 'open' entrypoint because a raffle is already open.
+    ✔ The unauthorized user Alice unsuccessfully calls 'initialise' entrypoint.
+    ✔ Admin unsuccessfully calls 'initialise' entrypoint with wrong 'close_buy'.
+    ✔ Admin unsuccessfully calls 'initialise' entrypoint with wrong 'reveal_fee'.
+    ✔ Admin unsuccessfully calls 'initialise' entrypoint by sending not enough tez to the contract.
+    ✔ Admin successfully calls 'initialise' entrypoint.
+    ✔ Admin unsuccessfully calls 'initialise' entrypoint because a raffle is already initialised.
 
   Test 'buy' entrypoint (at this point a raffle is open)
     ✔ Alice unsuccessfully calls 'buy' by sending a wrong amount of tez.
@@ -63,14 +63,19 @@ $ npm test
     ✔ Alice successfully calls 'buy' entrypoint.
     ✔ Alice unsuccessfully calls 'buy' entrypoint because she has already bought one.
     ✔ Jack successfully calls 'buy' entrypoint.
+    ✔ Bob successfully calls 'buy' entrypoint.
 
   Players reveal their raffle key (at this point a raffle is open and two players participated)
     ✔ Alice unsuccessfully calls 'reveal' entrypoint because it is before the 'close_date'.
     ✔ Alice unsuccessfully calls 'reveal' entrypoint because of an invalid chest key.
     ✔ Alice successfully calls 'reveal' entrypoint and gets the reveal fee.
     ✔ Alice unsuccessfully calls 'reveal' entrypoint because her raffle key is already revealed.
-    ✔ Owner successfully calls 'reveal' entrypoint to reveal Jack's raffle key; jackpot is transferred.
+    ✔ Owner successfully calls 'reveal' entrypoint to reveal Jack's raffle key.
+
+  Test 'transfer' entrypoint
+    ✔ Owner unsuccessfully calls 'transfer' entrypoint because transfer is closed.
+    ✔ Owner sucessfully calls 'transfer' entrypoint to send the jackpot to Jack.
 
 
-  17 passing (36s)
+  20 passing (45s)
 ```
