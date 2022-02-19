@@ -30,7 +30,7 @@ const OneHour           = 60 * OneMinute
 // Initialise arguments
 const OPEN_BUY          = now + 10 * OneMinute
 const CLOSE_BUY         = OPEN_BUY + 10 * OneHour
-const CLOSE_REVEAL      = CLOSE_BUY + OneHour
+const CLOSE_REVEAL      = CLOSE_BUY + 10 * OneHour
 const CHEST_TIME        = 10000000                   // 20 seconds on standard computer
 const REVEAL_FEE        = [ '2', '10' ]              // 20% (archetype rational type is 'pair int nat')
 
@@ -299,7 +299,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
 });
 describe("Test 'transfer' entrypoint", async () => {
   it("Owner unsuccessfully calls 'transfer' entrypoint because transfer is closed.", async () => {
-    setMockupNow(CLOSE_REVEAL);
+    setMockupNow(CLOSE_REVEAL - 1);
     await expectToThrow(async () => {
       await raffle.transfer({
         as : owner.pkh
@@ -307,7 +307,7 @@ describe("Test 'transfer' entrypoint", async () => {
     }, errors.TRANSFER_CLOSED)
   })
   it("Owner sucessfully calls 'transfer' entrypoint to send the jackpot to Jack.", async () => {
-    setMockupNow(CLOSE_REVEAL + (CLOSE_BUY - OPEN_BUY) + 1);
+    setMockupNow(CLOSE_REVEAL + 1);
     await checkBalanceDelta(jack.pkh, 63, async () => {
       await raffle.transfer({
         as : owner.pkh

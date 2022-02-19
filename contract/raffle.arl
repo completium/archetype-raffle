@@ -27,9 +27,9 @@ states =
 transition initialise(ob : date, cb : date, cr : date, t : nat, rf : rational) {
   called by owner
   require {
-    r0 : now <= ob < cb < cr       otherwise "INVALID_OPEN_CLOSE_BUY_REVEAL";
-    r1 : rf <= 1                   otherwise "INVALID_REVEAL_FEE";
-    r2 : transferred = jackpot     otherwise "INVALID_AMOUNT"
+    r0 : now <= ob < cb and cb - ob <= cr - cb otherwise "INVALID_OPEN_CLOSE_BUY_REVEAL";
+    r1 : rf <= 1                               otherwise "INVALID_REVEAL_FEE";
+    r2 : transferred = jackpot                 otherwise "INVALID_AMOUNT"
   }
   from Created to Initialised
   with effect {
@@ -68,7 +68,7 @@ entry reveal(addr : address, k : chest_key) {
 
 transition %transfer() {
   require {
-    r7: opt_get(close_reveal) + (opt_get(close_buy) - opt_get(open_buy)) < now otherwise "TRANSFER_CLOSED"
+    r7: opt_get(close_reveal) < now otherwise "TRANSFER_CLOSED"
   }
   from Initialised to Transferred
   with effect {
