@@ -31,6 +31,7 @@ const OneHour           = 60 * OneMinute
 const OPEN_BUY          = now + 10 * OneMinute
 const CLOSE_BUY         = OPEN_BUY + 10 * OneHour
 const CLOSE_REVEAL      = CLOSE_BUY + 10 * OneHour
+const OPEN_TRANSFER     = CLOSE_REVEAL + 10 * OneHour
 const CHEST_TIME        = 10000000                   // 20 seconds on standard computer
 const REVEAL_FEE        = [ '2', '10' ]              // 20% (archetype rational type is 'pair int nat')
 
@@ -61,7 +62,7 @@ const errors = {
   PLAYER_ALREADY_REVEALED : '"PLAYER_ALREADY_REVEALED"',
   INVALID_REVEAL_FEE      : '"INVALID_REVEAL_FEE"',
   TRANSFER_CLOSED         : '"TRANSFER_CLOSED"',
-  REVEAL_CLOSED           : '"REVEAL_CLOSED"'
+  INVALID_REVEAL_TIME     : '"INVALID_REVEAL_TIME"'
 }
 
 const closeTo = (value, target, epsilon) => { return Math.abs(value - target) < epsilon }
@@ -93,6 +94,7 @@ describe("Open Raffle", async () => {
           ob : OPEN_BUY,
           cb : CLOSE_BUY,
           cr : CLOSE_REVEAL,
+          ot : OPEN_TRANSFER,
           t  : CHEST_TIME,
           rf : REVEAL_FEE
         },
@@ -107,6 +109,7 @@ describe("Open Raffle", async () => {
           ob : OPEN_BUY,
           cb : OPEN_BUY,
           cr : CLOSE_REVEAL,
+          ot : OPEN_TRANSFER,
           t  : CHEST_TIME,
           rf : REVEAL_FEE
         },
@@ -121,6 +124,7 @@ describe("Open Raffle", async () => {
           ob : OPEN_BUY,
           cb : CLOSE_BUY,
           cr : CLOSE_REVEAL,
+          ot : OPEN_TRANSFER,
           t  : CHEST_TIME,
           rf : [ '20', '10' ]
         },
@@ -135,6 +139,7 @@ describe("Open Raffle", async () => {
           ob : OPEN_BUY,
           cb : CLOSE_BUY,
           cr : CLOSE_REVEAL,
+          ot : OPEN_TRANSFER,
           t  : CHEST_TIME,
           rf : REVEAL_FEE
         },
@@ -148,6 +153,7 @@ describe("Open Raffle", async () => {
         ob : OPEN_BUY,
         cb : CLOSE_BUY,
         cr : CLOSE_REVEAL,
+        ot : OPEN_TRANSFER,
         t  : CHEST_TIME,
         rf : REVEAL_FEE
       },
@@ -162,6 +168,7 @@ describe("Open Raffle", async () => {
           ob : OPEN_BUY,
           cb : CLOSE_BUY,
           cr : CLOSE_REVEAL,
+          ot : OPEN_TRANSFER,
           t  : CHEST_TIME,
           rf : REVEAL_FEE
         },
@@ -245,7 +252,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
         },
         as : alice.pkh
       })
-    }, errors.REVEAL_CLOSED)
+    }, errors.INVALID_REVEAL_TIME)
   });
   it("Alice unsuccessfully calls 'reveal' entrypoint because of an invalid chest key.", async () => {
     setMockupNow(CLOSE_BUY + 10);
@@ -284,6 +291,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
     }, errors.PLAYER_ALREADY_REVEALED)
   })
   it("Owner successfully calls 'reveal' entrypoint to reveal Jack's raffle key.", async () => {
+    setMockupNow(CLOSE_REVEAL + OneHour);
     await checkBalanceDelta(owner.pkh, d => closeTo(d, 1, 0.01), async () => {
     await checkBalanceDelta(alice.pkh,   0, async () => {
     await checkBalanceDelta(jack.pkh,    0, async () => {
@@ -307,7 +315,7 @@ describe("Test 'transfer' entrypoint", async () => {
     }, errors.TRANSFER_CLOSED)
   })
   it("Owner sucessfully calls 'transfer' entrypoint to send the jackpot to Jack.", async () => {
-    setMockupNow(CLOSE_REVEAL + 1);
+    setMockupNow(OPEN_TRANSFER + 1);
     await checkBalanceDelta(jack.pkh, 63, async () => {
       await raffle.transfer({
         as : owner.pkh
