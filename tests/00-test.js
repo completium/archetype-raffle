@@ -57,11 +57,11 @@ const errors = {
   PLAYER_ALREADY_EXISTS   : '(Pair "KeyExists" "player")',
   BUY_CLOSED              : '"BUY_CLOSED"',
   BUY_OPEN                : '"BUY_OPEN"',
-  INVALID_TIMELOCK        : '"INVALID_TIMELOCK"',
+  INVALID_CHEST_KEY       : '"INVALID_CHEST_KEY"',
   INVALID_STATE           : '"InvalidState"',
   PLAYER_ALREADY_REVEALED : '"PLAYER_ALREADY_REVEALED"',
   INVALID_REVEAL_FEE      : '"INVALID_REVEAL_FEE"',
-  TRANSFER_CLOSED         : '"TRANSFER_CLOSED"',
+  TRANSFER_CLOSED         : '(Pair "InvalidCondition" "r8")',
   INVALID_REVEAL_TIME     : '"INVALID_REVEAL_TIME"'
 }
 
@@ -264,7 +264,7 @@ describe("Players reveal their raffle key (at this point a raffle is open and tw
         },
         as : alice.pkh
       })
-    }, errors.INVALID_TIMELOCK)
+    }, errors.INVALID_CHEST_KEY)
   });
   it("Alice successfully calls 'reveal' entrypoint and gets the reveal fee.", async () => {
     await checkBalanceDelta(owner.pkh,  0, async () => {
