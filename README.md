@@ -51,11 +51,11 @@ $ npm test
 
   Open Raffle
     ✔ The unauthorized user Alice unsuccessfully calls 'initialise' entrypoint.
-    ✔ Admin unsuccessfully calls 'initialise' entrypoint with wrong 'close_buy'.
-    ✔ Admin unsuccessfully calls 'initialise' entrypoint with wrong 'reveal_fee'.
-    ✔ Admin unsuccessfully calls 'initialise' entrypoint by sending not enough tez to the contract.
-    ✔ Admin successfully calls 'initialise' entrypoint.
-    ✔ Admin unsuccessfully calls 'initialise' entrypoint because a raffle is already initialised.
+    ✔ Owner unsuccessfully calls 'initialise' entrypoint with wrong 'close_buy'.
+    ✔ Owner unsuccessfully calls 'initialise' entrypoint with wrong 'reveal_fee'.
+    ✔ Owner unsuccessfully calls 'initialise' entrypoint by sending not enough tez to the contract.
+    ✔ Owner successfully calls 'initialise' entrypoint.
+    ✔ Owner unsuccessfully calls 'initialise' entrypoint because a raffle is already initialised.
 
   Test 'buy' entrypoint (at this point a raffle is open)
     ✔ Alice unsuccessfully calls 'buy' by sending a wrong amount of tez.
@@ -70,12 +70,13 @@ $ npm test
     ✔ Alice unsuccessfully calls 'reveal' entrypoint because of an invalid chest key.
     ✔ Alice successfully calls 'reveal' entrypoint and gets the reveal fee.
     ✔ Alice unsuccessfully calls 'reveal' entrypoint because her raffle key is already revealed.
-    ✔ Owner successfully calls 'reveal' entrypoint to reveal Jack's raffle key.
+    ✔ Jack successfully calls 'reveal' entrypoint and gets the reveal fee.
 
   Test 'transfer' entrypoint
-    ✔ Owner unsuccessfully calls 'transfer' entrypoint because transfer is closed.
+    ✔ Owner unsucessfully calls 'transfer' entrypoint because Bob is not revealed.
+    ✔ Owner sucessfully calls 'reveal' entrypoint to remove Bob's chest, and gets the unlock reward.
     ✔ Owner sucessfully calls 'transfer' entrypoint to send the jackpot to Jack.
 
 
-  20 passing (45s)
+  21 passing (48s)
 ```

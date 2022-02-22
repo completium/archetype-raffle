@@ -56,23 +56,18 @@ entry reveal(addr : address, k : chest_key) {
   }
   effect {
     match open_chest(k, player[addr].locked_raffle_key, opt_get(chest_time)) with
-    | left (unlocked) -> begin
-        match unpack<nat>(unlocked) with
-        | some(partial_key) ->
-          raffle_key += partial_key;
-          player[addr].revealed := true
-        | none -> player.remove(addr)
-        end;
-        transfer (opt_get(reveal_fee) * ticket_price) to caller;
+    | left (unlocked) ->
+      match unpack<nat>(unlocked) with
+      | some(partial_key) ->
+        raffle_key += partial_key;
+        player[addr].revealed := true
+      | none -> player.remove(addr)
       end
-    | right(chest_key_error) -> begin
-       if chest_key_error then
-        fail("INVALID_CHEST_KEY")
-       else
-        player.remove(addr);
-        transfer (opt_get(reveal_fee) * ticket_price) to caller
-      end
-    end
+    | right(open_error) ->
+      if open_error then fail("INVALID_CHEST_KEY")
+      else player.remove(addr)
+    end;
+    transfer (opt_get(reveal_fee) * ticket_price) to caller;
   }
 }
 
