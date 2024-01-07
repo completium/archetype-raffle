@@ -4,8 +4,8 @@ archetype raffle(
   ticket_price : tez
 )
 
-variable open_buy      : option<date> = none
-variable close_buy     : option<date> = none
+variable open_buy     : option<date> = none
+variable close_buy    : option<date> = none
 
 variable chest_time   : option<nat>  = none
 variable reveal_fee   : option<rational> = none
@@ -41,33 +41,40 @@ transition initialise(ob : date, cb : date, t : nat, rf : rational) {
 
 entry buy (lrk : chest) {
   state is Initialised
+  constant {
+    value_open_buy ?is open_buy otherwise "ERROR";
+    value_close_buy ?is close_buy otherwise "ERROR";
+  }
   require {
-    r4 : transferred = ticket_price                     otherwise "INVALID_TICKET_PRICE";
-    r5 : opt_get(open_buy) < now < opt_get(close_buy)   otherwise "RAFFLE_CLOSED"
+    r4 : transferred = ticket_price               otherwise "INVALID_TICKET_PRICE";
+    r5 : value_open_buy < now < value_close_buy   otherwise "RAFFLE_CLOSED"
   }
   effect { player.add({ id = caller; locked_raffle_key = lrk }) }
 }
 
 entry reveal(addr : address, k : chest_key) {
   state is Initialised
+  constant {
+    value_close_buy ?is close_buy otherwise "ERROR";
+    value_chest_time ?is chest_time otherwise "ERROR";
+    value_reveal_fee ?is reveal_fee otherwise "ERROR";
+  }
   require {
-    r6 : opt_get(close_buy) < now   otherwise "RAFFLE_OPEN";
+    r6 : value_close_buy < now   otherwise "RAFFLE_OPEN";
     r7 : not player[addr].revealed  otherwise "PLAYER_ALREADY_REVEALED"
   }
   effect {
-    match open_chest(k, player[addr].locked_raffle_key, opt_get(chest_time)) with
-    | left (unlocked) ->
+    match open_chest(k, player[addr].locked_raffle_key, value_chest_time) with
+    | some (unlocked) ->
       match unpack<nat>(unlocked) with
       | some(partial_key) ->
         raffle_key += partial_key;
         player[addr].revealed := true
       | none -> player.remove(addr)
       end
-    | right(open_error) ->
-      if open_error then fail("INVALID_CHEST_KEY")
-      else player.remove(addr)
+    | none -> fail("INVALID_CHEST_KEY")
     end;
-    transfer (opt_get(reveal_fee) * ticket_price) to caller;
+    transfer (value_reveal_fee * ticket_price) to caller;
   }
 }
 
@@ -77,7 +84,8 @@ transition %transfer() {
   }
   from Initialised to Transferred
   with effect {
-    transfer balance to player.nth(raffle_key % player.count());
+    const dest ?= player.nth(raffle_key % player.count()) : "ERROR";
+    transfer balance to dest;
   }
 }
 
