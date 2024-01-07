@@ -27,8 +27,8 @@ transition initialise(ob : date, cb : date, t : nat, rf : rational) {
   called by owner
   require {
     r0 : now <= ob < cb         otherwise "INVALID_OPEN_CLOSE_BUY";
-    r2 : rf <= 1                otherwise "INVALID_REVEAL_FEE";
-    r3 : transferred = jackpot  otherwise "INVALID_AMOUNT"
+    r1 : rf <= 1                otherwise "INVALID_REVEAL_FEE";
+    r2 : transferred = jackpot  otherwise "INVALID_AMOUNT"
   }
   from Created to Initialised
   with effect {
@@ -46,8 +46,8 @@ entry buy (lrk : chest) {
     value_close_buy ?is close_buy otherwise "ERROR";
   }
   require {
-    r4 : transferred = ticket_price               otherwise "INVALID_TICKET_PRICE";
-    r5 : value_open_buy < now < value_close_buy   otherwise "RAFFLE_CLOSED"
+    r3 : transferred = ticket_price               otherwise "INVALID_TICKET_PRICE";
+    r4 : value_open_buy < now < value_close_buy   otherwise "RAFFLE_CLOSED"
   }
   effect { player.add({ id = caller; locked_raffle_key = lrk }) }
 }
@@ -60,8 +60,8 @@ entry reveal(addr : address, k : chest_key) {
     value_reveal_fee ?is reveal_fee otherwise "ERROR";
   }
   require {
-    r6 : value_close_buy < now   otherwise "RAFFLE_OPEN";
-    r7 : not player[addr].revealed  otherwise "PLAYER_ALREADY_REVEALED"
+    r5 : value_close_buy < now   otherwise "RAFFLE_OPEN";
+    r6 : not player[addr].revealed  otherwise "PLAYER_ALREADY_REVEALED"
   }
   effect {
     match open_chest(k, player[addr].locked_raffle_key, value_chest_time) with
@@ -80,7 +80,7 @@ entry reveal(addr : address, k : chest_key) {
 
 transition %transfer() {
   require {
-    r8: player.select(the.revealed).count() = player.count() otherwise "EXISTS_NOT_REVEALED"
+    r7: player.select(the.revealed).count() = player.count() otherwise "EXISTS_NOT_REVEALED"
   }
   from Initialised to Transferred
   with effect {
