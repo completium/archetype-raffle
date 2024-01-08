@@ -58,13 +58,14 @@ entry reveal(addr : address, k : chest_key) {
     value_close_buy ?is close_buy otherwise "ERROR";
     value_chest_time ?is chest_time otherwise "ERROR";
     value_reveal_fee ?is reveal_fee otherwise "ERROR";
+    value_player ?is player[addr] otherwise "PLAYER_NOT_FOUND";
   }
   require {
     r5 : value_close_buy < now   otherwise "RAFFLE_OPEN";
-    r6 : not player[addr].revealed  otherwise "PLAYER_ALREADY_REVEALED"
+    r6 : not value_player.revealed  otherwise "PLAYER_ALREADY_REVEALED"
   }
   effect {
-    match open_chest(k, player[addr].locked_raffle_key, value_chest_time) with
+    match open_chest(k, value_player.locked_raffle_key, value_chest_time) with
     | some (unlocked) ->
       match unpack<nat>(unlocked) with
       | some(partial_key) ->

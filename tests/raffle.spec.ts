@@ -30,7 +30,7 @@ const REVEAL_FEE = new Rational(20, 100)
  * Raw packed data: 0x050080890f
  * ...
  *
- * $ mockup-client timelock create for 10000000 with 0x050080890f in data/chest_alice
+ * $ mockup-client timelock create for 10000000 with "$(echo -e '\x05\x00\x80\x89\x0f')" in data/chest_alice
  * Timelock chest and chest_key computed.
  *
  * $ xxd -p data/chest_alice/time_chest_190195d94a3629e6ce3422bca11c281d943c5682034b05ccc40c6d73609ab7bd | tr -d '\n'; echo ""
