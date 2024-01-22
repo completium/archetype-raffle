@@ -67,11 +67,15 @@ entry reveal(addr : address, k : chest_key) {
   effect {
     match open_chest(k, value_player.locked_raffle_key, value_chest_time) with
     | some (unlocked) ->
-      match unpack<nat>(unlocked) with
-      | some(partial_key) ->
-        raffle_key += partial_key;
-        player[addr].revealed := true
-      | none -> player.remove(addr)
+      if length(unlocked) = 0
+      then player.remove(addr)
+      else begin
+        match unpack<nat>(unlocked) with
+        | some(partial_key) ->
+          raffle_key += partial_key;
+          player[addr].revealed := true
+        | none -> player.remove(addr)
+        end
       end
     | none -> fail("INVALID_CHEST_KEY")
     end;
