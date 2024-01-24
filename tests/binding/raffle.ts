@@ -217,6 +217,7 @@ export class Raffle {
         INVALID_CHEST_KEY: att.string_to_mich("\"INVALID_CHEST_KEY\""),
         r6: att.string_to_mich("\"PLAYER_ALREADY_REVEALED\""),
         r5: att.string_to_mich("\"RAFFLE_OPEN\""),
+        PLAYER_NOT_FOUND: att.string_to_mich("\"PLAYER_NOT_FOUND\""),
         r4: att.string_to_mich("\"RAFFLE_CLOSED\""),
         r3: att.string_to_mich("\"INVALID_TICKET_PRICE\""),
         r2: att.string_to_mich("\"INVALID_AMOUNT\""),
