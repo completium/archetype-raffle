@@ -14,6 +14,30 @@ export const mich_to_state = (m: any): states => {
         default: throw new Error("mich_to_asset_type : invalid value " + v);
     }
 };
+export class r_settings implements att.ArchetypeType {
+    constructor(public open_buy: Date, public close_buy: Date, public chest_time: att.Nat, public reveal_fee: att.Rational) { }
+    toString(): string {
+        return JSON.stringify(this, null, 2);
+    }
+    to_mich(): att.Micheline {
+        return att.pair_to_mich([att.date_to_mich(this.open_buy), att.date_to_mich(this.close_buy), this.chest_time.to_mich(), this.reveal_fee.to_mich()]);
+    }
+    equals(v: r_settings): boolean {
+        return att.micheline_equals(this.to_mich(), v.to_mich());
+    }
+    static from_mich(input: att.Micheline): r_settings {
+        return new r_settings(att.mich_to_date((input as att.Mpair).args[0]), att.mich_to_date((input as att.Mpair).args[1]), att.Nat.from_mich((input as att.Mpair).args[2]), att.Rational.from_mich(att.pair_to_mich((input as att.Mpair as att.Mpair).args.slice(3, 5))));
+    }
+}
+export const r_settings_mich_type: att.MichelineType = att.pair_array_to_mich_type([
+    att.prim_annot_to_mich_type("timestamp", ["%open_buy"]),
+    att.prim_annot_to_mich_type("timestamp", ["%close_buy"]),
+    att.prim_annot_to_mich_type("nat", ["%chest_time"]),
+    att.pair_array_to_mich_type([
+        att.prim_annot_to_mich_type("int", []),
+        att.prim_annot_to_mich_type("nat", [])
+    ], ["%reveal_fee"])
+], []);
 export const player_key_mich_type: att.MichelineType = att.prim_annot_to_mich_type("address", []);
 export class player_value implements att.ArchetypeType {
     constructor(public locked_raffle_key: att.Chest, public revealed: boolean) { }
@@ -156,52 +180,31 @@ export class Raffle {
         }
         throw new Error("Contract not initialised");
     }
-    async get_open_buy(): Promise<att.Option<Date>> {
+    async get_o_settings(): Promise<att.Option<r_settings>> {
         if (this.address != undefined) {
             const storage = await ex.get_raw_storage(this.address);
-            return att.Option.from_mich((storage as att.Mpair).args[3], x => { return att.mich_to_date(x); });
-        }
-        throw new Error("Contract not initialised");
-    }
-    async get_close_buy(): Promise<att.Option<Date>> {
-        if (this.address != undefined) {
-            const storage = await ex.get_raw_storage(this.address);
-            return att.Option.from_mich((storage as att.Mpair).args[4], x => { return att.mich_to_date(x); });
-        }
-        throw new Error("Contract not initialised");
-    }
-    async get_chest_time(): Promise<att.Option<att.Nat>> {
-        if (this.address != undefined) {
-            const storage = await ex.get_raw_storage(this.address);
-            return att.Option.from_mich((storage as att.Mpair).args[5], x => { return att.Nat.from_mich(x); });
-        }
-        throw new Error("Contract not initialised");
-    }
-    async get_reveal_fee(): Promise<att.Option<att.Rational>> {
-        if (this.address != undefined) {
-            const storage = await ex.get_raw_storage(this.address);
-            return att.Option.from_mich((storage as att.Mpair).args[6], x => { return att.Rational.from_mich(x); });
+            return att.Option.from_mich((storage as att.Mpair).args[3], x => { return r_settings.from_mich(x); });
         }
         throw new Error("Contract not initialised");
     }
     async get_player(): Promise<player_container> {
         if (this.address != undefined) {
             const storage = await ex.get_raw_storage(this.address);
-            return att.mich_to_map((storage as att.Mpair).args[7], (x, y) => [att.Address.from_mich(x), player_value.from_mich(y)]);
+            return att.mich_to_map((storage as att.Mpair).args[4], (x, y) => [att.Address.from_mich(x), player_value.from_mich(y)]);
         }
         throw new Error("Contract not initialised");
     }
     async get_raffle_key(): Promise<att.Nat> {
         if (this.address != undefined) {
             const storage = await ex.get_raw_storage(this.address);
-            return att.Nat.from_mich((storage as att.Mpair).args[8]);
+            return att.Nat.from_mich((storage as att.Mpair).args[5]);
         }
         throw new Error("Contract not initialised");
     }
     async get_state(): Promise<states> {
         if (this.address != undefined) {
             const storage = await ex.get_raw_storage(this.address);
-            const state = (storage as att.Mpair).args[9];
+            const state = (storage as att.Mpair).args[6];
             switch (att.Int.from_mich(state).to_number()) {
                 case 0: return states.Created;
                 case 1: return states.Initialised;
@@ -212,12 +215,13 @@ export class Raffle {
     }
     errors = {
         INVALID_STATE: att.string_to_mich("\"INVALID_STATE\""),
-        ERROR: att.string_to_mich("\"ERROR\""),
+        INTERNAL_ERROR: att.string_to_mich("\"INTERNAL_ERROR\""),
         r7: att.string_to_mich("\"EXISTS_NOT_REVEALED\""),
         INVALID_CHEST_KEY: att.string_to_mich("\"INVALID_CHEST_KEY\""),
         r6: att.string_to_mich("\"PLAYER_ALREADY_REVEALED\""),
         r5: att.string_to_mich("\"RAFFLE_OPEN\""),
         PLAYER_NOT_FOUND: att.string_to_mich("\"PLAYER_NOT_FOUND\""),
+        SETTINGS_NOT_INITIALIZED: att.string_to_mich("\"SETTINGS_NOT_INITIALIZED\""),
         r4: att.string_to_mich("\"RAFFLE_CLOSED\""),
         r3: att.string_to_mich("\"INVALID_TICKET_PRICE\""),
         r2: att.string_to_mich("\"INVALID_AMOUNT\""),
